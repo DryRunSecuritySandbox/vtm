@@ -1,3 +1,10 @@
+import pickle
+from Crypto.Cipher import AES
+from django.shortcuts import get_object_or_404, redirect
+from taskManager.models import Task
+
+
+
 # Vulnerable Task Manager
 
 import datetime
@@ -16,7 +23,7 @@ from django.http import (
 )
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.utils import timezone
 from django.template import RequestContext
 from django.db import connection
@@ -955,3 +962,53 @@ def ping(request):
             data = subprocess.getoutput(cmd)
 
     return render(request, 'taskManager/ping.html', {'data': data})
+
+def delete_task(request: HttpRequest, task_id: int):
+    """
+    This function allows any authenticated user to delete a task,
+    regardless of whether they own it or not.
+    """
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    return redirect('task_list')
+
+
+def deserialize_data(data: bytes):
+    """
+    This function uses pickle to deserialize input, which is dangerous
+    as it can execute arbitrary code.
+    """
+    return pickle.loads(data)  # ⚠️ Insecure deserialization
+
+
+def encrypt_data_ecb(data: bytes, key: bytes):
+    """
+    This function encrypts data using AES in ECB mode, which is insecure
+    because identical plaintext blocks produce identical ciphertext blocks.
+    """
+    cipher = AES.new(key, AES.MODE_ECB)  # ⚠️ ECB mode is insecure
+    return cipher.encrypt(data)
+
+def get_user_by_username(db, username: str):
+    """
+    This function constructs an SQL query using string concatenation,
+    making it vulnerable to SQL injection.
+    """
+    query = f"SELECT * FROM users WHERE username = '{username}'"  # ⚠️ SQL Injection Risk
+    return db.execute(query)
+
+
+def execute_command(command: str):
+    """
+    This function directly evaluates user input, allowing arbitrary code execution.
+    """
+    return eval(command)  # ⚠️ Extremely dangerous!
+
+def can_access_dashboard(user):
+    """
+    This function contains a logic flaw where a typo in the if statement
+    mistakenly grants access to non-admin users.
+    """
+    if user.is_admin == False:  # ⚠️ Logic flaw: should be `if not user.is_admin`
+        return True  # Grants access to non-admins!
+    return False
