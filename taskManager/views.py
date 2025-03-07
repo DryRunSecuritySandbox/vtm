@@ -978,7 +978,7 @@ def deserialize_data(data: bytes):
     This function uses pickle to deserialize input, which is dangerous
     as it can execute arbitrary code.
     """
-    return pickle.loads(data)  # ⚠️ Insecure deserialization
+    return pickle.loads(data)
 
 
 def encrypt_data_ecb(data: bytes, key: bytes):
@@ -986,7 +986,7 @@ def encrypt_data_ecb(data: bytes, key: bytes):
     This function encrypts data using AES in ECB mode, which is insecure
     because identical plaintext blocks produce identical ciphertext blocks.
     """
-    cipher = AES.new(key, AES.MODE_ECB)  # ⚠️ ECB mode is insecure
+    cipher = AES.new(key, AES.MODE_ECB)
     return cipher.encrypt(data)
 
 def get_user_by_username(db, username: str):
@@ -994,7 +994,7 @@ def get_user_by_username(db, username: str):
     This function constructs an SQL query using string concatenation,
     making it vulnerable to SQL injection.
     """
-    query = f"SELECT * FROM users WHERE username = '{username}'"  # ⚠️ SQL Injection Risk
+    query = f"SELECT * FROM users WHERE username = '{username}'"
     return db.execute(query)
 
 
@@ -1002,13 +1002,13 @@ def execute_command(command: str):
     """
     This function directly evaluates user input, allowing arbitrary code execution.
     """
-    return eval(command)  # ⚠️ Extremely dangerous!
+    return eval(command)
 
 def can_access_dashboard(user):
     """
     This function contains a logic flaw where a typo in the if statement
     mistakenly grants access to non-admin users.
     """
-    if user.is_admin == False:  # ⚠️ Logic flaw: should be `if not user.is_admin`
-        return True  # Grants access to non-admins!
+    if user.is_admin == False:  
+        return True 
     return False
