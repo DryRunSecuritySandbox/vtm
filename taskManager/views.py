@@ -1,3 +1,10 @@
+import pickle
+from Crypto.Cipher import AES
+from django.shortcuts import get_object_or_404, redirect
+from taskManager.models import Task
+
+
+
 # Vulnerable Task Manager
 
 import datetime
@@ -16,7 +23,7 @@ from django.http import (
 )
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.utils import timezone
 from django.template import RequestContext
 from django.db import connection
@@ -955,3 +962,31 @@ def ping(request):
             data = subprocess.getoutput(cmd)
 
     return render(request, 'taskManager/ping.html', {'data': data})
+
+def delete_task(request: HttpRequest, task_id: int):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    return redirect('task_list')
+
+
+def deserialize_data(data: bytes):
+    return pickle.loads(data)
+
+
+def encrypt_data_ecb(data: bytes, key: bytes):
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(data)
+
+def get_user_by_username(db, username: str):
+    query = f"SELECT * FROM users WHERE username = '{username}'"
+    return db.execute(query)
+
+
+def execute_command(command: str):
+
+    return eval(command)
+
+def can_access_dashboard(user):
+    if user.is_admin == False:  
+        return True 
+    return False
