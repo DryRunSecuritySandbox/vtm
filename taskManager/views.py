@@ -2,9 +2,6 @@ import pickle
 from Crypto.Cipher import AES
 from django.shortcuts import get_object_or_404, redirect
 from taskManager.models import Task
-
-
-
 # Vulnerable Task Manager
 
 import datetime
