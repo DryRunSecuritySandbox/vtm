@@ -958,23 +958,21 @@ def ping(request):
 
 @csrf_exempt
 def legacy_sql_view(request):
-    """SQL Injection via direct concatenation"""
     if request.method == "GET":
         user = request.GET.get("username")
         query = f"SELECT * FROM auth_user WHERE username = '{user}';"
         with connection.cursor() as cursor:
-            cursor.execute(query)  # 🔥 SQL Injection
+            cursor.execute(query)
             row = cursor.fetchone()
         return JsonResponse({"result": str(row)})
 
 
 @login_required
 def run_command(request):
-    """Command Injection via unvalidated shell input"""
     if request.method == "POST":
         data = json.loads(request.body)
         cmd = data.get("cmd")
-        output = subprocess.check_output(f"echo {cmd}", shell=True)  # 🔥 Command Injection
+        output = subprocess.check_output(f"echo {cmd}", shell=True) 
         return HttpResponse(output)
 
 
