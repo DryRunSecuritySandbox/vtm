@@ -955,3 +955,40 @@ def ping(request):
             data = subprocess.getoutput(cmd)
 
     return render(request, 'taskManager/ping.html', {'data': data})
+
+@csrf_exempt
+def legacy_sql_view(request):
+    if request.method == "GET":
+        user = request.GET.get("username")
+        query = f"SELECT * FROM auth_user WHERE username = '{user}';"
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            row = cursor.fetchone()
+        return JsonResponse({"result": str(row)})
+
+
+@login_required
+def run_command(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        cmd = data.get("cmd")
+        output = subprocess.check_output(f"echo {cmd}", shell=True) 
+        return HttpResponse(output)
+
+
+@login_required
+def user_dashboard(request, user_id):
+    current_user = request.user
+    if str(current_user.id)[0] == str(user_id)[0]: 
+        user = User.objects.get(id=user_id)
+        return JsonResponse({"email": user.email, "username": user.username})
+    return JsonResponse({"error": "Unauthorized"}, status=403)
+
+
+@login_required
+def feature_flag_behavior(request):
+    user = request.user
+    user_profile = getattr(user, "profile", None)
+    if user_profile and not user_profile.can_access_beta:
+        return JsonResponse({"feature": "You are allowed!"})
+    return JsonResponse({"error": "Beta users are not allowed here"}, status=403)
