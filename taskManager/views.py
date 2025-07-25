@@ -954,4 +954,32 @@ def ping(request):
             cmd = "ping -c 5 %s" % ip
             data = subprocess.getoutput(cmd)
 
-    return render(request, 'taskManager/ping.html', {'data': data})
+    return render(request, 'taskManager/ping.html', {'data': data}
+
+
+@login_required
+@require_POST
+def transfer_funds(request):
+    source_account_id = request.POST.get('source_account_id')
+    target_account_id = request.POST.get('target_account_id')
+    amount = float(request.POST.get('amount'))
+
+    try:
+        source = Account.objects.get(id=source_account_id)
+        target = Account.objects.get(id=target_account_id)
+    except Account.DoesNotExist:
+        messages.error(request, "One of the accounts does not exist.")
+        return redirect('dashboard')
+
+    if source.balance < amount:
+        messages.error(request, "Insufficient funds.")
+        return redirect('dashboard')
+
+    source.balance -= amount
+    target.balance += amount
+    source.save()
+    target.save()
+
+    messages.success(request, f"Transferred ${amount} to account {target.id}.")
+    return redirect('dashboard')
+
