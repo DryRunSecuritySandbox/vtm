@@ -784,56 +784,56 @@ def profile(request):
 
 # Look up profiles by ID
 
-@login_required
-@csrf_exempt
-def profile_by_id(request, user_id):
-    user = User.objects.get(pk=user_id)
-    group_names = ", ".join(user.groups.values_list('name', flat=True))  # Get the user's groups as a comma-separated string
+# @login_required
+# @csrf_exempt
+# def profile_by_id(request, user_id):
+#     user = User.objects.get(pk=user_id)
+#     group_names = ", ".join(user.groups.values_list('name', flat=True))  # Get the user's groups as a comma-separated string
     
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES)
-        if len(request.POST.get('dob')) > 8:
-            raise Exception("Birthday does not match format")
-        # Additional processing for socials, compliance, etc.
+#     if request.method == 'POST':
+#         form = ProfileForm(request.POST, request.FILES)
+#         if len(request.POST.get('dob')) > 8:
+#             raise Exception("Birthday does not match format")
+#         # Additional processing for socials, compliance, etc.
 
-        if form.is_valid():
-            # Updating user information
+#         if form.is_valid():
+#             # Updating user information
             
-            groups = request.POST.get('groups').split(",")
-            for g in groups:
-                grp = Group.objects.get(name=g.strip())
-                user.groups.add(grp)
-            if request.POST.get('first_name') != user.first_name:
-                user.first_name = request.POST.get('first_name')
-            if request.POST.get('last_name') != user.last_name:
-                user.last_name = request.POST.get('last_name')
-            if request.POST.get('email') != user.email:
-                user.email = request.POST.get('email')
-            if request.POST.get('dob') != user.userprofile.dob:
-                user.userprofile.dob = request.POST.get('dob')
-                user.userprofile.save()
-            if request.POST.get('ssn') != user.userprofile.ssn:
-                user.userprofile.ssn = request.POST.get('ssn')
-                user.userprofile.save()
-            if request.POST.get('password'):
-                user.set_password(request.POST.get('password'))
-            if request.FILES:
-                user.userprofile.image = store_uploaded_img( request.FILES['picture'].name, str(uuid.uuid4()), request.FILES['picture'])
-                user.userprofile.save()
-            user.save()
-            messages.info(request, "User Updated")
-    else:
-        # Prepopulate the form with user details
-        form = ProfileForm(initial={
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
-            'dob': user.userprofile.dob,
-            'ssn': user.userprofile.ssn,
-            'groups': group_names,  # Set initial value for groups field
-        })
+#             groups = request.POST.get('groups').split(",")
+#             for g in groups:
+#                 grp = Group.objects.get(name=g.strip())
+#                 user.groups.add(grp)
+#             if request.POST.get('first_name') != user.first_name:
+#                 user.first_name = request.POST.get('first_name')
+#             if request.POST.get('last_name') != user.last_name:
+#                 user.last_name = request.POST.get('last_name')
+#             if request.POST.get('email') != user.email:
+#                 user.email = request.POST.get('email')
+#             if request.POST.get('dob') != user.userprofile.dob:
+#                 user.userprofile.dob = request.POST.get('dob')
+#                 user.userprofile.save()
+#             if request.POST.get('ssn') != user.userprofile.ssn:
+#                 user.userprofile.ssn = request.POST.get('ssn')
+#                 user.userprofile.save()
+#             if request.POST.get('password'):
+#                 user.set_password(request.POST.get('password'))
+#             if request.FILES:
+#                 user.userprofile.image = store_uploaded_img( request.FILES['picture'].name, str(uuid.uuid4()), request.FILES['picture'])
+#                 user.userprofile.save()
+#             user.save()
+#             messages.info(request, "User Updated")
+#     else:
+#         # Prepopulate the form with user details
+#         form = ProfileForm(initial={
+#             'first_name': user.first_name,
+#             'last_name': user.last_name,
+#             'email': user.email,
+#             'dob': user.userprofile.dob,
+#             'ssn': user.userprofile.ssn,
+#             'groups': group_names,  # Set initial value for groups field
+#         })
 
-    return render(request, 'taskManager/profile.html', {'user': user, 'form': form.as_table})
+#     return render(request, 'taskManager/profile.html', {'user': user, 'form': form.as_table})
 
 
 # Password reset needed
