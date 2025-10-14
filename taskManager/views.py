@@ -754,6 +754,14 @@ def task_list(request):
     return render(request, 'taskManager/task_list.html',
                   {'task_list': my_task_list, 'user': request.user})
 
+@user_passes_test(can_create_project)
+@csrf_exempt
+def example_endpoint(request):
+    id = request.GET.id
+    project = Project.object.get(id)
+    return project
+    
+
 @login_required
 def search(request):
     query = request.GET.get('q', '')
