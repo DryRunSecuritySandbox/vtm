@@ -48,6 +48,22 @@
       "risk_level": "high",
       "includes": [],
       "excludes": []
+    },
+    "configured-codepaths-analyzer": {
+      "enabled": false,
+      "silent": false,
+      "blocking": false,
+      "risk_level": "critical",
+      "includes": [],
+      "excludes": []
+    },
+    "secrets-analyzer": {
+      "enabled": false,
+      "silent": false,
+      "blocking": false,
+      "risk_level": "critical",
+      "includes": [],
+      "excludes": []
     }
   },
   "codePolicies": [
@@ -64,7 +80,7 @@
   "drifts": [
     {
       "title": "Replay execution identity",
-      "content": "[crossrepo-validation-cache-identity]\n20261014-xrepo-history-v1. Source repository: DryRunSecuritySandbox/vtm.\n[/crossrepo-validation-cache-identity]"
+      "content": "[crossrepo-validation-cache-identity]\n20261014-xrepo-history-v2. Source repository: DryRunSecuritySandbox/vtm.\n[/crossrepo-validation-cache-identity]"
     }
   ],
   "sensitiveCodepaths": [],
